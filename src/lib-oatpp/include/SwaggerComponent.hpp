@@ -56,7 +56,7 @@ class SwaggerComponent
 			.setTitle(OATPP_SWAGGER_SERVICE_NAME " API interface service")
 			.setDescription("Provide a set of API documents for describing the front-end and back-end interactions of the " OATPP_SWAGGER_SERVICE_NAME)
 			.setVersion("1.0.0")
-			.setContactName("01 Star")
+			.setContactName("HeBack")
 			.setContactUrl("https://space.bilibili.com/1653229811/?spm_id_from=333.999.0.0")
 			.setContactEmail("01xq@mail.com")
 			.setLicenseName("Apache License, Version 2.0")

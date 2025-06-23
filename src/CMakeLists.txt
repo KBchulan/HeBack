@@ -1,10 +1,7 @@
-﻿# CMakeList.txt: 顶层 CMake 项目文件，在此处执行全局配置
-# 并包含子项目。
-#
-cmake_minimum_required (VERSION 3.8)
+﻿cmake_minimum_required (VERSION 3.8)
 
 # 指定工程名
-project ("zero-one-community")
+project ("HeBack")
 
 # 设置安装目录前缀
 if(NOT WIN32)
@@ -77,10 +74,15 @@ endif()
 # Liunx环境库依赖检查
 if (NOT WIN32)
 	# 检查OpenSSL库是否存在
+	set(OPENSSL_ROOT_DIR "/usr/local/openssl-1.1.1" CACHE PATH "Root directory of OpenSSL 1.1.1")
 	find_package (OpenSSL REQUIRED)
 	if (OPENSSL_FOUND)
-	  include_directories (${OPENSSL_INCLUDE_DIRS})
-	  message (STATUS "OpenSSL Found!")
+	  include_directories (SYSTEM ${OPENSSL_INCLUDE_DIRS})
+	  message (STATUS "OpenSSL Found! Version: ${OPENSSL_VERSION}")
+      message (STATUS "OpenSSL Include Dirs: ${OPENSSL_INCLUDE_DIRS}")
+      message (STATUS "OpenSSL Libraries: ${OPENSSL_LIBRARIES}")
+	else()
+      message(FATAL_ERROR "OpenSSL 1.1.1 not found. Please ensure OPENSSL_ROOT_DIR is correct and points to a valid OpenSSL 1.1.1 installation.")
 	endif()
 	# 检查CURL库是否存在
 	find_package (CURL REQUIRED)
@@ -163,11 +165,12 @@ add_subdirectory ("lib-common")
 if(UNIX)
 	add_subdirectory ("nacos-register")
 endif()
+
 # 单元测试模块
 if(DEFINED UNIT_TEST)
 	add_subdirectory ("arch-tests")
 endif()
-# 这是示例模块，后期可以不编译它
+# 示例模块
 # add_subdirectory ("arch-demo")
 # 在后面添加你的模块
-add_subdirectory("HeBack")
+add_subdirectory ("HeBack")
