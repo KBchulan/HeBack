@@ -1,0 +1,27 @@
+loginup:
+    refreshtoken:
+        summary: 刷新令牌请求
+    profile:
+        summary: 获取用户信息请求
+    resetpassword:
+        summary: 重置密码请求
+    logout:
+        summary: 登出请求
+    login:
+        summary: 登录请求
+    register:
+        summary: 注册请求
+    sendcode:
+        summary: 发送验证码请求
+    field:
+        code: 验证码
+        phone: 手机号
+        password: 密码
+        codeType: 验证码类型
+        ipAddress: IP地址
+        nickname: 昵称
+        accessToken: 访问令牌
+        refreshToken: 刷新令牌
+        userId: 用户ID
+        expiresIn: 令牌过期时间
+        registerTime: 注册时间
