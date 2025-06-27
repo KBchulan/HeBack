@@ -83,7 +83,11 @@ std::shared_ptr<oatpp::web::server::interceptor::RequestInterceptor::OutgoingRes
 		path.find("/swagger/") == 0 || 
 		path.find("/api-docs/") == 0 || 
 		path.find("/system-kill/") == 0 ||
-		path.find("/file/") == 0)
+		path.find("/file/") == 0 ||
+		path.find("/api/auth/send-code") == 0 ||     // ·¢ËÍÑéÖ¤Âë
+		path.find("/api/auth/register") == 0 ||      // ×¢²á
+		path.find("/api/auth/login-code") == 0 ||    // ÑéÖ¤ÂëµÇÂ¼
+		path.find("/api/auth/login-password") == 0)  // ÃÜÂëµÇÂ¼
 	{
 		return nullptr;
 	}

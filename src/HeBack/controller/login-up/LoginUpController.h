@@ -40,8 +40,15 @@ public:
 	ENDPOINT_INFO(sendCode) {
 		API_DEF_ADD_TITLE(ZH_WORDS_GETTER("loginup.sendcode.summary"));
 		API_DEF_ADD_RSP_JSON_WRAPPER(StringJsonVO);
+		API_DEF_ADD_QUERY_PARAMS(String, "phone", ZH_WORDS_GETTER("loginup.field.phone"), "18737519552", true);
+		API_DEF_ADD_QUERY_PARAMS(String, "codeType", ZH_WORDS_GETTER("loginup.field.codeType"), "LOGIN", true);
+		API_DEF_ADD_QUERY_PARAMS(String, "ipAddress", ZH_WORDS_GETTER("loginup.field.ipAddress"), "127.0.0.1", true);
 	}
-	ENDPOINT(API_M_POST, "/api/auth/send-code", sendCode, BODY_DTO(SendCodeDTO::Wrapper, dto)) {
+	ENDPOINT(API_M_POST, "/api/auth/send-code", sendCode, QUERY(String, phone, "phone"), QUERY(String, codeType, "codeType"), QUERY(String, ipAddress, "ipAddress")) {
+		auto dto = SendCodeDTO::createShared();
+		dto->phone = phone;
+		dto->codeType = codeType;
+		dto->ipAddress = ipAddress;
 		API_HANDLER_RESP_VO(execSendCode(dto));
 	}
 
@@ -49,26 +56,45 @@ public:
 	ENDPOINT_INFO(registerUser) {
 		API_DEF_ADD_TITLE(ZH_WORDS_GETTER("loginup.register.summary"));
 		API_DEF_ADD_RSP_JSON_WRAPPER(LoginJsonVO);
+		API_DEF_ADD_QUERY_PARAMS(String, "phone", ZH_WORDS_GETTER("loginup.field.phone"), "18737519552", true);
+		API_DEF_ADD_QUERY_PARAMS(String, "code", ZH_WORDS_GETTER("loginup.field.code"), "123456", true);
+		API_DEF_ADD_QUERY_PARAMS(String, "password", ZH_WORDS_GETTER("loginup.field.password"), "123456", true);
+		API_DEF_ADD_QUERY_PARAMS(String, "nickname", ZH_WORDS_GETTER("loginup.field.nickname"), "Chulan", true);
 	}
-	ENDPOINT(API_M_POST, "/api/auth/register", registerUser, BODY_DTO(RegisterDTO::Wrapper, dto)) {
+	ENDPOINT(API_M_POST, "/api/auth/register", registerUser, QUERY(String, phone, "phone"), QUERY(String, code, "code"), QUERY(String, password, "password"), QUERY(String, nickname, "nickname")) {
+		auto dto = RegisterDTO::createShared();
+		dto->phone = phone;
+		dto->code = code;
+		dto->password = password;
+		dto->nickname = nickname;
 		API_HANDLER_RESP_VO(execRegister(dto));
 	}
 
-	// ==================== 3.1 用户登录接口（密码登录） ====================
+	// ==================== 3.1 用户登录接口（验证码登录） ====================
+	ENDPOINT_INFO(loginByCode) {
+		API_DEF_ADD_TITLE(ZH_WORDS_GETTER("loginup.login-code.summary"));
+		API_DEF_ADD_RSP_JSON_WRAPPER(LoginJsonVO);
+		API_DEF_ADD_QUERY_PARAMS(String, "phone", ZH_WORDS_GETTER("logiup.field.phone"), "18737519552", true);
+		API_DEF_ADD_QUERY_PARAMS(String, "code", ZH_WORDS_GETTER("logiup.field.code"), "123456", true);
+	}
+	ENDPOINT(API_M_POST, "/api/auth/login-code", loginByCode, QUERY(String, phone, "phone"), QUERY(String, code, "code")) {
+		auto dto = LoginByCodeDTO::createShared();
+		dto->phone = phone;
+		dto->code = code;
+		API_HANDLER_RESP_VO(execLoginByCode(dto));
+	}
+
+	// ==================== 3.2 用户登录接口（密码登录） ====================
 	ENDPOINT_INFO(loginByPassword) {
 		API_DEF_ADD_TITLE(ZH_WORDS_GETTER("loginup.login-password.summary"));
 		API_DEF_ADD_RSP_JSON_WRAPPER(LoginJsonVO);
+		API_DEF_ADD_QUERY_PARAMS(String, "phone", ZH_WORDS_GETTER("logiup.field.phone"), "18737519552", true);
+		API_DEF_ADD_QUERY_PARAMS(String, "password", ZH_WORDS_GETTER("logiup.field.password"), "whx051021", true);
 	}
-	ENDPOINT(API_M_POST, "/api/auth/login-password", loginByPassword, BODY_DTO(LoginByPasswordDTO::Wrapper, dto)) {
-		API_HANDLER_RESP_VO(execLoginByPassword(dto));
-	}
-
-	// ==================== 3.2 用户登录接口（验证码登录） ====================
-	ENDPOINT_INFO(loginByPassword) {
-		API_DEF_ADD_TITLE(ZH_WORDS_GETTER("loginup.login-code.summary"));
-		API_DEF_ADD_RSP_JSON_WRAPPER(LoginJsonVO);
-	}
-	ENDPOINT(API_M_POST, "/api/auth/login-code", loginByPassword, BODY_DTO(LoginByCodeDTO::Wrapper, dto)) {
+	ENDPOINT(API_M_POST, "/api/auth/login-password", loginByPassword, QUERY(String, phone, "phone"), QUERY(String, password, "password")) {
+		auto dto = LoginByPasswordDTO::createShared();
+		dto->phone = phone;
+		dto->password = password;
 		API_HANDLER_RESP_VO(execLoginByPassword(dto));
 	}
 
@@ -85,9 +111,17 @@ public:
 	// ==================== 5. 重置密码接口 ====================
 	ENDPOINT_INFO(resetPassword) {
 		API_DEF_ADD_TITLE(ZH_WORDS_GETTER("loginup.resetpassword.summary"));
+		API_DEF_ADD_AUTH();
 		API_DEF_ADD_RSP_JSON_WRAPPER(StringJsonVO);
+		API_DEF_ADD_QUERY_PARAMS(String, "phone", ZH_WORDS_GETTER("logiup.field.phone"), "18737519552", true);
+		API_DEF_ADD_QUERY_PARAMS(String, "code", ZH_WORDS_GETTER("logiup.field.code"), "123456", true);
+		API_DEF_ADD_QUERY_PARAMS(String, "newPassword", ZH_WORDS_GETTER("loginup.field.newPassword"), "new123456", true);
 	}
-	ENDPOINT(API_M_POST, "/api/auth/reset-password", resetPassword, BODY_DTO(ResetPasswordDTO::Wrapper, dto)) {
+	ENDPOINT(API_M_POST, "/api/auth/reset-password", resetPassword, QUERY(String, phone, "phone"), QUERY(String, code, "code"), QUERY(String, newPassword, "newPassword"), API_HANDLER_AUTH_PARAME) {
+		auto dto = ResetPasswordDTO::createShared();
+		dto->phone = phone;
+		dto->code = code;
+		dto->newPassword = newPassword;
 		API_HANDLER_RESP_VO(execResetPassword(dto));
 	}
 
@@ -104,9 +138,13 @@ public:
 	// ==================== 7. 刷新Token接口 ====================
 	ENDPOINT_INFO(refreshToken) {
 		API_DEF_ADD_TITLE(ZH_WORDS_GETTER("loginup.refreshtoken.summary"));
+		API_DEF_ADD_AUTH();
 		API_DEF_ADD_RSP_JSON_WRAPPER(RefreshTokenJsonVO);
+		API_DEF_ADD_QUERY_PARAMS(String, "refreshToken", ZH_WORDS_GETTER("loginup.field.refreshToken"), "aaaa", true);
 	}
-	ENDPOINT(API_M_POST, "/api/auth/refresh-token", refreshToken, BODY_DTO(RefreshTokenDTO::Wrapper, dto)) {
+	ENDPOINT(API_M_POST, "/api/auth/refresh-token", refreshToken, QUERY(String, refreshTokenParam, "refreshToken"), API_HANDLER_AUTH_PARAME) {
+		auto dto = RefreshTokenDTO::createShared();
+		dto->refreshToken = refreshTokenParam;
 		API_HANDLER_RESP_VO(execRefreshToken(dto));
 	}
 
@@ -118,7 +156,10 @@ private:
 	// 执行用户注册
 	LoginJsonVO::Wrapper execRegister(const RegisterDTO::Wrapper& dto);
 	
-	// 执行用户登录
+	// 执行用户登录 - 使用验证码
+	LoginJsonVO::Wrapper execLoginByCode(const LoginByCodeDTO::Wrapper& loginData);
+
+	// 执行用户登录 - 使用密码
 	LoginJsonVO::Wrapper execLoginByPassword(const LoginByPasswordDTO::Wrapper& loginData);
 	
 	// 执行用户登出

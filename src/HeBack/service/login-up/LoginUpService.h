@@ -67,7 +67,7 @@ private:
 	std::string generateUserId();
 
 	// 生成JWT Token
-	std::string generateJwtToken(const std::string& userId, const std::string& phone, int64_t expiresIn = 3600);
+	std::string generateJwtToken(const std::string& userId, const std::string& phone, int64_t expiresIn = 3600); // 1小时
 
 	// 生成刷新Token
 	std::string generateRefreshToken(const std::string& userId, int64_t expiresIn = 86400 * 7); // 7天
@@ -98,9 +98,6 @@ private:
 
 	// 获取当前时间字符串
 	std::string getCurrentTimeString();
-
-	// 获取客户端IP地址(模拟实现)
-	std::string getClientIpAddress();
 
 	// 初始化Redis连接
 	void initRedisClient();

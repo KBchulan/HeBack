@@ -1,27 +1,37 @@
-loginup:
+ï»¿loginup:
     refreshtoken:
-        summary: Ë¢ĞÂÁîÅÆÇëÇó
+        summary: åˆ·æ–°ä»¤ç‰Œè¯·æ±‚
     profile:
-        summary: »ñÈ¡ÓÃ»§ĞÅÏ¢ÇëÇó
+        summary: è·å–ç”¨æˆ·ä¿¡æ¯è¯·æ±‚
     resetpassword:
-        summary: ÖØÖÃÃÜÂëÇëÇó
+        summary: å¯†ç é‡ç½®è¯·æ±‚
+        success: å¯†ç é‡ç½®æˆåŠŸ
+        fail: å¯†ç é‡ç½®å¤±è´¥
     logout:
-        summary: µÇ³öÇëÇó
-    login:
-        summary: µÇÂ¼ÇëÇó
+        summary: ç™»å‡ºè¯·æ±‚
+        success: ç™»å‡ºæˆåŠŸ
+        fail: ç™»å‡ºå¤±è´¥
+    login-code:
+        summary: ç™»å½•è¯·æ±‚(éªŒè¯ç )
+    login-password:
+        summary: ç™»å½•è¯·æ±‚(å¯†ç )
     register:
-        summary: ×¢²áÇëÇó
+        summary: æ³¨å†Œè¯·æ±‚
+        fail: æ³¨å†Œå¤±è´¥
     sendcode:
-        summary: ·¢ËÍÑéÖ¤ÂëÇëÇó
+        summary: å‘é€éªŒè¯ç è¯·æ±‚
+        success: å‘é€éªŒè¯ç æˆåŠŸ
+        fail: å‘é€éªŒè¯ç å¤±è´¥
     field:
-        code: ÑéÖ¤Âë
-        phone: ÊÖ»úºÅ
-        password: ÃÜÂë
-        codeType: ÑéÖ¤ÂëÀàĞÍ
-        ipAddress: IPµØÖ·
-        nickname: êÇ³Æ
-        accessToken: ·ÃÎÊÁîÅÆ
-        refreshToken: Ë¢ĞÂÁîÅÆ
-        userId: ÓÃ»§ID
-        expiresIn: ÁîÅÆ¹ıÆÚÊ±¼ä
-        registerTime: ×¢²áÊ±¼ä
+        code: éªŒè¯ç 
+        phone: æ‰‹æœºå·
+        password: å¯†ç 
+        newPassword: æ–°å¯†ç 
+        codeType: éªŒè¯ç ç±»å‹
+        ipAddress: IPåœ°å€
+        nickname: æ˜µç§°
+        accessToken: è®¿é—®ä»¤ç‰Œ
+        refreshToken: åˆ·æ–°ä»¤ç‰Œ
+        userId: ç”¨æˆ·ID
+        expiresIn: ä»¤ç‰Œè¿‡æœŸæ—¶é—´
+        registerTime: æ³¨å†Œæ—¶é—´

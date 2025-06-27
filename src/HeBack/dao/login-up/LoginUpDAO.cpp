@@ -104,10 +104,12 @@ PtrUserDO LoginUpDAO::selectUserById(const string& userId) {
 }
 
 int LoginUpDAO::updateUserInfo(const UserDO& user) {
-	string sql = "UPDATE `t_user` SET `nickname`=?, `avatar`=?, `update_time`=? WHERE `user_id`=?";
-	return sqlSession->executeUpdate(sql, "%s%s%s%s",
+	string sql = "UPDATE `t_user` SET `password`=?, `nickname`=?, `avatar`=?, `status`=?, `update_time`=? WHERE `user_id`=?";
+	return sqlSession->executeUpdate(sql, "%s%s%s%s%s%s",
+		user.getPassword(),
 		user.getNickname(),
 		user.getAvatar(),
+		user.getStatus(),
 		user.getUpdateTime(),
 		user.getUserId());
 }

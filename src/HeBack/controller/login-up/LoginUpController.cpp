@@ -21,21 +21,13 @@
 #include "LoginUpController.h"
 #include <service/login-up/LoginUpService.h>
 
-StringJsonVO::Wrapper LoginUpController::execSendCode(const SendCodeDTO::Wrapper& dto)
-{
+StringJsonVO::Wrapper LoginUpController::execSendCode(const SendCodeDTO::Wrapper& dto) {
 	// 定义返回数据对象
 	auto jvo = StringJsonVO::createShared();
 
 	// 参数校验
 	// 非空校验
-	if (!dto->phone || !dto->codeType)
-	{
-		jvo->init(nullptr, RS_PARAMS_INVALID);
-		return jvo;
-	}
-	// 有效值校验
-	if (dto->phone->empty() || dto->codeType->empty())
-	{
+	if (dto->phone->empty() || dto->codeType->empty() || dto->ipAddress->empty()) {
 		jvo->init(nullptr, RS_PARAMS_INVALID);
 		return jvo;
 	}
@@ -46,8 +38,7 @@ StringJsonVO::Wrapper LoginUpController::execSendCode(const SendCodeDTO::Wrapper
 	if (service.sendCode(dto)) {
 		jvo->success(ZH_WORDS_GETTER("loginup.sendcode.success"));
 	}
-	else
-	{
+	else {
 		jvo->fail(ZH_WORDS_GETTER("loginup.sendcode.fail"));
 	}
 	// 响应结果
@@ -60,13 +51,33 @@ LoginJsonVO::Wrapper LoginUpController::execRegister(const RegisterDTO::Wrapper&
 
 	// 参数校验
 	// 非空校验
-	if (!dto->phone || !dto->code || !dto->password) {
+	if (dto->phone->empty() || dto->code->empty() || dto->password->empty() || dto->nickname->empty()) {
 		jvo->init(nullptr, RS_PARAMS_INVALID);
 		return jvo;
 	}
-	// 有效值校验
-	if (dto->phone->empty() || dto->code->empty() || dto->password->empty())
-	{
+
+	// 定义一个Service
+	LoginUpService service;
+
+	// 执行数据操作
+	auto result = service.registerUser(dto);
+	if (result != nullptr) {
+		jvo->success(result);
+	}
+	else {
+		jvo->fail(nullptr);
+	}
+	// 响应结果
+	return jvo;
+}
+
+LoginJsonVO::Wrapper LoginUpController::execLoginByCode(const LoginByCodeDTO::Wrapper& dto) {
+	// 定义返回数据对象
+	auto jvo = LoginJsonVO::createShared();
+
+	// 参数校验
+	// 非空校验
+	if (dto->phone->empty() || dto->code->empty()) {
 		jvo->init(nullptr, RS_PARAMS_INVALID);
 		return jvo;
 	}
@@ -74,7 +85,7 @@ LoginJsonVO::Wrapper LoginUpController::execRegister(const RegisterDTO::Wrapper&
 	// 定义一个Service
 	LoginUpService service;
 	// 执行数据操作
-	auto result = service.registerUser(dto);
+	auto result = service.loginByCode(dto);
 	if (result != nullptr) {
 		jvo->success(result);
 	}
@@ -91,14 +102,7 @@ LoginJsonVO::Wrapper LoginUpController::execLoginByPassword(const LoginByPasswor
 
 	// 参数校验
 	// 非空校验
-	if (!dto->phone || !dto->password)
-	{
-		jvo->init(nullptr, RS_PARAMS_INVALID);
-		return jvo;
-	}
-	// 有效值校验
-	if (dto->phone->empty() || dto->password->empty())
-	{
+	if (dto->phone->empty() || dto->password->empty()) {
 		jvo->init(nullptr, RS_PARAMS_INVALID);
 		return jvo;
 	}
@@ -110,16 +114,14 @@ LoginJsonVO::Wrapper LoginUpController::execLoginByPassword(const LoginByPasswor
 	if (result != nullptr) {
 		jvo->success(result);
 	}
-	else
-	{
+	else {
 		jvo->fail(nullptr);
 	}
 	// 响应结果
 	return jvo;
 }
 
-StringJsonVO::Wrapper LoginUpController::execLogout(const PayloadDTO& payload)
-{
+StringJsonVO::Wrapper LoginUpController::execLogout(const PayloadDTO& payload) {
 	// 定义返回数据对象
 	auto jvo = StringJsonVO::createShared();
 
@@ -129,29 +131,20 @@ StringJsonVO::Wrapper LoginUpController::execLogout(const PayloadDTO& payload)
 	if (service.logout(payload)) {
 		jvo->success(ZH_WORDS_GETTER("loginup.logout.success"));
 	}
-	else
-	{
+	else {
 		jvo->fail(ZH_WORDS_GETTER("loginup.logout.fail"));
 	}
 	// 响应结果
 	return jvo;
 }
 
-StringJsonVO::Wrapper LoginUpController::execResetPassword(const ResetPasswordDTO::Wrapper& dto)
-{
+StringJsonVO::Wrapper LoginUpController::execResetPassword(const ResetPasswordDTO::Wrapper& dto) {
 	// 定义返回数据对象
 	auto jvo = StringJsonVO::createShared();
 
 	// 参数校验
 	// 非空校验
-	if (!dto->phone || !dto->code || !dto->newPassword)
-	{
-		jvo->init(nullptr, RS_PARAMS_INVALID);
-		return jvo;
-	}
-	// 有效值校验
-	if (dto->phone->empty() || dto->code->empty() || dto->newPassword->empty())
-	{
+	if (dto->phone->empty() || dto->code->empty() || dto->newPassword->empty()) {
 		jvo->init(nullptr, RS_PARAMS_INVALID);
 		return jvo;
 	}
@@ -162,16 +155,14 @@ StringJsonVO::Wrapper LoginUpController::execResetPassword(const ResetPasswordDT
 	if (service.resetPassword(dto)) {
 		jvo->success(ZH_WORDS_GETTER("loginup.resetpassword.success"));
 	}
-	else
-	{
+	else {
 		jvo->fail(ZH_WORDS_GETTER("loginup.resetpassword.fail"));
 	}
 	// 响应结果
 	return jvo;
 }
 
-UserProfileJsonVO::Wrapper LoginUpController::execGetUserProfile(const PayloadDTO& payload)
-{
+UserProfileJsonVO::Wrapper LoginUpController::execGetUserProfile(const PayloadDTO& payload) {
 	// 定义返回数据对象
 	auto jvo = UserProfileJsonVO::createShared();
 
@@ -182,29 +173,20 @@ UserProfileJsonVO::Wrapper LoginUpController::execGetUserProfile(const PayloadDT
 	if (result != nullptr) {
 		jvo->success(result);
 	}
-	else
-	{
+	else {
 		jvo->fail(nullptr);
 	}
 	// 响应结果
 	return jvo;
 }
 
-RefreshTokenJsonVO::Wrapper LoginUpController::execRefreshToken(const RefreshTokenDTO::Wrapper& dto)
-{
+RefreshTokenJsonVO::Wrapper LoginUpController::execRefreshToken(const RefreshTokenDTO::Wrapper& dto) {
 	// 定义返回数据对象
 	auto jvo = RefreshTokenJsonVO::createShared();
 
 	// 参数校验
 	// 非空校验
-	if (!dto->refreshToken)
-	{
-		jvo->init(nullptr, RS_PARAMS_INVALID);
-		return jvo;
-	}
-	// 有效值校验
-	if (dto->refreshToken->empty())
-	{
+	if (dto->refreshToken->empty()) {
 		jvo->init(nullptr, RS_PARAMS_INVALID);
 		return jvo;
 	}
@@ -216,8 +198,7 @@ RefreshTokenJsonVO::Wrapper LoginUpController::execRefreshToken(const RefreshTok
 	if (result != nullptr) {
 		jvo->success(result);
 	}
-	else
-	{
+	else {
 		jvo->fail(nullptr);
 	}
 	// 响应结果

@@ -19,8 +19,8 @@
 
 #include "stdafx.h"
 #include "LoginUpService.h"
-#include "../../domain/do/login-up/LoginUpDO.h"
-#include "../../dao/login-up/LoginUpDAO.h"
+#include <domain/do/login-up/LoginUpDO.h>
+#include <dao/login-up/LoginUpDAO.h>
 #include "SimpleDateTimeFormat.h"
 #include "JWTUtil.h"
 #include "bcrypt/bcrypt.h"
@@ -34,7 +34,7 @@
 #include "sms/aliyun/AliSmsSender.h"
 #endif
 
-// JWT密钥配置，实际项目应该放在配置文件中
+// JWT密钥配置，此处先写死
 #define JWT_SECRET_KEY "whx12345678987654321"
 #define CODE_EXPIRE_TIME 300 // 5分钟
 #define CODE_LENGTH 6		 // 验证码长度
@@ -53,10 +53,15 @@ bool LoginUpService::sendCode(const SendCodeDTO::Wrapper& dto) {
             return false;
         }
 
-        // 发送验证码
-        if (!sendSmsCode(dto->phone, code, dto->codeType)) {
-            return false;
-        }
+        // 发送验证码 - 暂时没有签名，先不考虑这个
+        //if (!sendSmsCode(dto->phone, code, dto->codeType)) {
+        //    return false;
+        //}
+
+        LoginUpDAO dao;
+
+        // 验证是否有记录
+        auto res = dao.selectLatestSmsCodeByPhone(dto->phone, dto->codeType);
 
         // 存储记录
         SmsCodeDO smsCode;
@@ -64,10 +69,20 @@ bool LoginUpService::sendCode(const SendCodeDTO::Wrapper& dto) {
         smsCode.setCode(code);
         smsCode.setCodeType(dto->codeType);
         smsCode.setSendTime(getCurrentTimeString());
-        smsCode.setAttemptCount(0);
-        smsCode.setIpAddress(getClientIpAddress());
 
-        LoginUpDAO dao;
+        // 不存在记录
+        if (!res) {
+            std::cout << "no record, insert new record\n";
+            smsCode.setAttemptCount(0);
+        }
+        else {
+            // 否则存储更多的尝试次数
+            auto newAttempt = res->getAttemptCount() + 1;
+            smsCode.setAttemptCount(newAttempt);
+        }
+        
+        smsCode.setIpAddress(dto->ipAddress);
+
         dao.insertSmsCodeRecord(smsCode);
 
         return true;
@@ -82,38 +97,40 @@ LoginVO::Wrapper LoginUpService::registerUser(const RegisterDTO::Wrapper& dto) {
     auto loginVO = LoginVO::createShared();
 
     try {
-        // 1. 验证验证码
+        // 验证验证码
         if (!validateCodeFromRedis(dto->phone, dto->code, "REGISTER")) {
             return nullptr;
         }
 
-        // 2. 检查用户是否已存在
+        // 检查用户是否已存在
         if (isUserExists(dto->phone)) {
+            std::cout << "User already exists" << '\n';
             return nullptr;
         }
 
-        // 3. 创建用户数据
+        // 创建用户数据
         UserDO user;
         user.setUserId(generateUserId());
         user.setPhone(dto->phone);
         user.setPassword(encryptPassword(dto->password));
         user.setNickname(dto->nickname ? dto->nickname : "用户" + user.getUserId().substr(0, 8));
+        user.setAvatar("http://chulan.xin/imgs/index.ico");
         user.setStatus("ACTIVE");
         user.setCreateTime(getCurrentTimeString());
         user.setUpdateTime(getCurrentTimeString());
 
-        // 4. 保存用户到数据库
+        // 保存用户到数据库
         LoginUpDAO dao;
         int result = dao.insertUser(user);
         if (result <= 0) {
             return nullptr;
         }
 
-        // 5. 生成登录凭证
+        // 生成登录凭证
         std::string accessToken = generateJwtToken(user.getUserId(), user.getPhone());
         std::string refreshToken = generateRefreshToken(user.getUserId());
 
-        // 6. 封装返回结果
+        // 封装返回结果
         loginVO->userId = user.getUserId();
         loginVO->accessToken = accessToken;
         loginVO->refreshToken = refreshToken;
@@ -180,6 +197,9 @@ LoginVO::Wrapper LoginUpService::loginByPassword(const LoginByPasswordDTO::Wrapp
         std::string accessToken = generateJwtToken(user->getUserId(), user->getPhone());
         std::string refreshToken = generateRefreshToken(user->getUserId());
 
+        std::cout << accessToken << '\n';
+        std::cout << refreshToken << '\n';
+
         loginVO->userId = user->getUserId();
         loginVO->accessToken = accessToken;
         loginVO->refreshToken = refreshToken;
@@ -212,24 +232,23 @@ bool LoginUpService::logout(const PayloadDTO& payload) {
 
 bool LoginUpService::resetPassword(const ResetPasswordDTO::Wrapper& dto) {
     try {
-        // 1. 验证验证码
+        // 验证验证码
         if (!validateCodeFromRedis(dto->phone, dto->code, "RESET_PASSWORD")) {
             return false;
         }
 
-        // 2. 查找用户
+        // 查找用户
         LoginUpDAO dao;
         auto user = dao.selectUserByPhone(dto->phone);
         if (!user) {
             return false;
         }
 
-        // 3. 更新密码
+        // 更新密码
         user->setPassword(encryptPassword(dto->newPassword));
         user->setUpdateTime(getCurrentTimeString());
 
-        int result = dao.updateUserInfo(*user);
-        return result > 0;
+        return dao.updateUserInfo(*user) > 0;
     }
     catch (const std::exception& e) {
         std::cerr << "Reset password error: " << e.what() << std::endl;
@@ -348,7 +367,7 @@ bool LoginUpService::storeCodeToRedis(const std::string& phone, const std::strin
             });
     }
     catch (const std::exception& e) {
-        std::cerr << "Store code to redis error: " << e.what() << std::endl;
+        std::cerr << "Store code to redis error: " << e.what() << '\n';
         return false;
     }
 }
@@ -408,11 +427,6 @@ bool LoginUpService::isUserExists(const std::string& phone) {
 
 std::string LoginUpService::getCurrentTimeString() {
     return SimpleDateTimeFormat::format();
-}
-
-std::string LoginUpService::getClientIpAddress() {
-    // 模拟实现，实际应该从请求中获取
-    return "127.0.0.1";
 }
 
 void LoginUpService::initRedisClient() {

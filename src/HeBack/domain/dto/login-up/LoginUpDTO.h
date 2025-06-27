@@ -43,6 +43,12 @@ class SendCodeDTO : public oatpp::DTO {
 	DTO_FIELD_INFO(codeType) {
 		info->description = ZH_WORDS_GETTER("loginup.field.codeType");
 	}
+
+	// IP地址
+	DTO_FIELD(String, ipAddress);
+	DTO_FIELD_INFO(ipAddress) {
+		info->description = ZH_WORDS_GETTER("loginup.field.ipAddress");
+	}
 };
 
 /**
@@ -69,7 +75,7 @@ class RegisterDTO : public oatpp::DTO {
 		info->description = ZH_WORDS_GETTER("loginup.field.password");
 	}
 
-	// 用户昵称（可选）
+	// 用户昵称
 	DTO_FIELD(String, nickname);
 	DTO_FIELD_INFO(nickname) {
 		info->description = ZH_WORDS_GETTER("loginup.field.nickname");
@@ -115,20 +121,7 @@ class LoginByPasswordDTO : public oatpp::DTO {
 };
 
 /**
- * 4 用户登出DTO
- */
-class LogoutDTO : public oatpp::DTO {
-	DTO_INIT(LogoutDTO, DTO);
-
-	// 访问令牌
-	DTO_FIELD(String, accessToken);
-	DTO_FIELD_INFO(accessToken) {
-		info->description = ZH_WORDS_GETTER("loginup.field.accessToken");
-	}
-};
-
-/**
- * 5 重置密码DTO
+ * 4 重置密码DTO
  */
 class ResetPasswordDTO : public oatpp::DTO {
 	DTO_INIT(ResetPasswordDTO, DTO);
@@ -153,7 +146,7 @@ class ResetPasswordDTO : public oatpp::DTO {
 };
 
 /**
- * 6 刷新Token DTO
+ * 5 刷新Token DTO
  */
 class RefreshTokenDTO : public oatpp::DTO {
 	DTO_INIT(RefreshTokenDTO, DTO);

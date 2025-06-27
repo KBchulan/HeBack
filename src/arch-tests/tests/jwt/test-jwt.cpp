@@ -65,7 +65,7 @@ yFWOL1mvZRpXPUlg70H4wARoJjK6XgNKcE6GWbOedNtyiVJ7b07bmf9YJX2NWOzE
 -----END PRIVATE KEY-----)");
 
 // 定义一个Hamc秘钥
-#define TEST_HAMC_SECRET "01star"
+#define TEST_HAMC_SECRET "heback"
 
 #define TEST_CREATE_PAYLOAD() \
 PayloadDTO p; \

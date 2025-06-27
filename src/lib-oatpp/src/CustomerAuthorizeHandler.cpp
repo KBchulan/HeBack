@@ -1,7 +1,7 @@
 /*
  Copyright Zero One Star. All rights reserved.
 
- @Author: awei
+ @Author: Chulan
  @Date: 2022/12/05 17:04:13
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +34,7 @@
 // zwIDAQAB
 // -----END PUBLIC KEY-----)");
 
-// RSA��Կ
+// RSA公钥
 std::unique_ptr<std::string> RSA_PUB_KEY = nullptr;
 
 CustomerAuthorizeObject::CustomerAuthorizeObject(PayloadDTO payload)
@@ -49,7 +49,7 @@ const PayloadDTO& CustomerAuthorizeObject::getPayload()
 
 CustomerAuthorizeHandler::CustomerAuthorizeHandler()
 {
-	//��ȡ��Կ
+	//读取公钥
 	if (!RSA_PUB_KEY)
 	{
 		std::string pubKey = "";
@@ -67,16 +67,29 @@ CustomerAuthorizeHandler::CustomerAuthorizeHandler()
 	}
 }
 
-std::shared_ptr<oatpp::web::server::handler::AuthorizationHandler::AuthorizationObject> CustomerAuthorizeHandler::authorize(const oatpp::String& token)
-{
-	// ����ƾ֤
-	PayloadDTO payload = JWTUtil::verifyTokenByRsa(token, RSA_PUB_KEY->c_str());
+//std::shared_ptr<oatpp::web::server::handler::AuthorizationHandler::AuthorizationObject> CustomerAuthorizeHandler::authorize(const oatpp::String& token)
+//{
+//	// 解析凭证
+//	PayloadDTO payload = JWTUtil::verifyTokenByRsa(token, RSA_PUB_KEY->c_str());
+//	if (payload.getCode() != PayloadCode::SUCCESS) {
+//		std::stringstream ss;
+//		ss << "Token: check fail code <" << PayloadDTO::getCodeName(payload.getCode()) << ">.";
+//		throw std::logic_error(ss.str());
+//	}
+//	// 将数据存放到授权对象中
+//	payload.setToken(token);
+//	return std::make_shared<CustomerAuthorizeObject>(payload);
+//}
+
+std::shared_ptr<oatpp::web::server::handler::AuthorizationHandler::AuthorizationObject> CustomerAuthorizeHandler::authorize(const oatpp::String& token) {
+	// 使用HMAC验证，与生成时保持一致
+	PayloadDTO payload = JWTUtil::verifyTokenByHmac(token, "whx12345678987654321");  // 使用相同的密钥
 	if (payload.getCode() != PayloadCode::SUCCESS) {
 		std::stringstream ss;
 		ss << "Token: check fail code <" << PayloadDTO::getCodeName(payload.getCode()) << ">.";
 		throw std::logic_error(ss.str());
 	}
-	// �����ݴ�ŵ���Ȩ������
+	// 载荷数据存放到授权对象里
 	payload.setToken(token);
 	return std::make_shared<CustomerAuthorizeObject>(payload);
 }
