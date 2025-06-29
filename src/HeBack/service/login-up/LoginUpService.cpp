@@ -197,9 +197,6 @@ LoginVO::Wrapper LoginUpService::loginByPassword(const LoginByPasswordDTO::Wrapp
         std::string accessToken = generateJwtToken(user->getUserId(), user->getPhone());
         std::string refreshToken = generateRefreshToken(user->getUserId());
 
-        std::cout << accessToken << '\n';
-        std::cout << refreshToken << '\n';
-
         loginVO->userId = user->getUserId();
         loginVO->accessToken = accessToken;
         loginVO->refreshToken = refreshToken;
